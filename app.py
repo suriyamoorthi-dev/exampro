@@ -9,9 +9,15 @@ import json
 app = Flask(__name__)
 app.secret_key = "suriya"  # 🔐 Required for sessions and forms
 
+from flask import Flask, send_from_directory
+import os
+
+app = Flask(__name__)
+
+# ✅ Serve ads.txt from root
 @app.route('/ads.txt')
 def ads():
-    return app.send_static_file('ads.txt')
+    return send_from_directory(os.path.dirname(os.path.abspath(__file__)), 'ads.txt')
 
 
 # Database setup
