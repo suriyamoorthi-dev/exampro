@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Admin Bulk Upload - Exam Questions</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 700px; margin: 20px auto; }
+  label { display: block; margin-top: 10px; font-weight: bold; }
+  select, input[type="file"], button { width: 100%; padding: 8px; margin-top: 5px; }
+  .message { padding: 10px; margin-top: 15px; border-radius: 4px; }
+  .success { background-color: #d4edda; color: #155724; }
+  .error { background-color: #f8d7da; color: #721c24; }
+</style>
+<script>
+  // JS to update dependent dropdowns
+  const sections = {{ sections|tojson }};
+  const topics = {{ topics|tojson }};
+
+  function updateSections() {
+    const examSelect = document.getElementById('exam');
+    const sectionSelect = document.getElementById('section');
+    const topicSelect = document.getElementById('topic');
+    const exam = examSelect.value;
+
+    sectionSelect.innerHTML = '<option value="">Select Section</option>';
+    topicSelect.innerHTML = '<option value="">Select Topic</option>';
+
+    if (exam && sections[exam]) {
+      sections[exam].forEach(s => {
+        let opt = document.createElement('option');
+        opt.value = s;
+        opt.textContent = s;
+        sectionSelect.appendChild(opt);
+      });
+    }
+  }
+
+  function updateTopics() {
+    const examSelect = document.getElementById('exam');
+    const sectionSelect = document.getElementById('section');
+    const topicSelect = document.getElementById('topic');
+    const exam = examSelect.value;
+    const section = sectionSelect.value;
+
+    topicSelect.innerHTML = '<option value="">Select Topic</option>';
+
+    if (exam && section && topics[exam] && topics[exam][section]) {
+      topics[exam][section].forEach(t => {
+        let opt = document.createElement('option');
+        opt.value = t;
+        opt.textContent = t;
+        topicSelect.appendChild(opt);
+      });
+    }
+  }
+</script>
+</head>
+<body>
+
+<h2>Admin Bulk Upload - Exam Questions</h2>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, msg in messages %}
+      <div class="message {{ category }}">{{ msg }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<form action="{{ url_for('admin_upload') }}" method="POST" enctype="multipart/form-data">
+  <label for="exam">Select Exam</label>
+  <select name="exam" id="exam" required onchange="updateSections()">
+    <option value="">Select Exam</option>
+    {% for e in exams %}
+      <option value="{{ e }}">{{ e }}</option>
+    {% endfor %}
+  </select>
+
+  <label for="section">Select Sub-Exam / Section</label>
+  <select name="section" id="section" required onchange="updateTopics()">
+    <option value="">Select Section</option>
+  </select>
+
+  <label for="topic">Select Topic / Sub-Topic</label>
+  <select name="topic" id="topic" required>
+    <option value="">Select Topic</option>
+  </select>
+
+  <label for="csv_file">Upload CSV file (columns: question, option_a, option_b, option_c, option_d, answer)</label>
+  <input type="file" name="csv_file" id="csv_file" accept=".csv" required />
+
+  <button type="submit" style="margin-top: 15px;">Upload Questions</button>
+</form>
+
+</body>
+<script>
+  // Initialize dropdowns if you want (optional)
+</script>
+</html>

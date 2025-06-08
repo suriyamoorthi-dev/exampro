@@ -1,23 +1,21 @@
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template, jsonify,redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 import os
 import random
 import re
 import requests
-import json
+from io import TextIOWrapper
+from flask import Flask, render_template, request, redirect, url_for, session
+
+import csv
+
 
 app = Flask(__name__)
 app.secret_key = "suriya"  # 🔐 Required for sessions and forms
 
-from flask import Flask, send_from_directory
-import os
-
-app = Flask(__name__)
-
-# ✅ Serve ads.txt from root
 @app.route('/ads.txt')
 def ads():
-    return send_from_directory(os.path.dirname(os.path.abspath(__file__)), 'ads.txt')
+    return app.send_static_file('ads.txt')
 
 
 # Database setup
@@ -54,6 +52,24 @@ class Question(db.Model):
             },
             "answer": self.answer
         }
+
+@app.route("/about")
+def about():
+    return render_template("about.html")
+@app.route("/privacy")
+def privacy():
+    return render_template("privacy.html")
+
+@app.route("/terms")
+def terms():
+    return render_template("terms.html")
+
+@app.route("/contact")
+def contact():
+    return render_template("contact.html")
+@app.route("/adsense")
+def adsense():
+    return render_template("adsense.html")
 
 
 @app.route('/doubt')
@@ -391,6 +407,9 @@ def generate_questions():
     else:
         return "Invalid mode selected", 400
 
+from flask import session
+import json
+
 @app.route('/submit_exam', methods=['POST'])
 def submit_exam():
     question_ids = request.form.getlist('question_id')
@@ -400,24 +419,164 @@ def submit_exam():
     score = 0
     total = len(question_ids)
     weak_tracker = {}
+    results_data = []
 
     for i, qid in enumerate(question_ids):
         user_answer = request.form.get(f"user_answer_{qid}")
         correct = correct_answers[i]
         section = sections[i]
+        q_obj = Question.query.get(int(qid))  # Ensure it's int
 
         if section not in weak_tracker:
             weak_tracker[section] = {'total': 0, 'correct': 0}
-
         weak_tracker[section]['total'] += 1
         if user_answer == correct:
             score += 1
             weak_tracker[section]['correct'] += 1
 
+        results_data.append({
+            'question': q_obj.question_text,
+            'options': {
+                'A': q_obj.option_a,
+                'B': q_obj.option_b,
+                'C': q_obj.option_c,
+                'D': q_obj.option_d,
+            },
+            'correct': correct,
+            'user': user_answer,
+            'is_correct': user_answer == correct
+        })
+
     weak_areas = [sec for sec, data in weak_tracker.items()
                   if data['correct'] / data['total'] < 0.6]
 
-    return render_template("result.html", score=score, total=total, weak_areas=weak_areas)
+    # ✅ Save to session as JSON string
+    session['results_data'] = json.dumps(results_data)  # 💥 DON'T store directly!
+    session['score'] = score
+    session['total'] = total
+    session['weak_areas'] = weak_areas
+
+    return render_template("result.html", score=score, total=total,
+                           weak_areas=weak_areas)
+
+    
+
+@app.route('/admin_upload', methods=['GET', 'POST'])
+def admin_upload():
+    exams = ['SSC', 'TNPSC', 'Railway', 'UPSC']
+    sections = {
+        'SSC': ['CGL', 'CHSL'],
+        'TNPSC': ['Group 1', 'Group 2', 'Group 3', 'Group 4'],
+        'Railway': ['ALP', 'Group D'],
+        'UPSC': ['Prelims', 'Mains']
+    }
+    topics = {
+        'SSC': {
+            'CGL': ['General Intelligence & Reasoning', 'Quantitative Aptitude', 'General Awareness', 'English Comprehension'],
+            'CHSL': ['General Intelligence', 'Quantitative Aptitude', 'General Awareness', 'English Language']
+        },
+        'TNPSC': {
+            'Group 1': ['History', 'Geography', 'Polity', 'Aptitude', 'Economy', 'Reasoning', 'Tamil'],
+            'Group 2': ['History', 'Geography', 'Polity', 'Aptitude', 'Economy', 'Reasoning', 'Tamil'],
+            'Group 3': ['History', 'Geography', 'Polity', 'Aptitude', 'Economy', 'Reasoning', 'Tamil'],
+            'Group 4': ['History', 'Geography', 'Tamil', 'Polity', 'Economy'],
+        },
+        'Railway': {
+            'ALP': ['Physics', 'Technical'],
+            'Group D': ['Current Affairs', 'Biology']
+        },
+        'UPSC': {
+            'Prelims': ['CSAT', 'General Studies'],
+            'Mains': ['Essay', 'Ethics']
+        }
+    }
+
+    if request.method == 'POST':
+        exam = request.form.get('exam')
+        section = request.form.get('section')
+        topic = request.form.get('topic')
+        file = request.files.get('csv_file')
+
+        if not exam or not section or not topic or not file:
+            flash('Please fill all fields and upload a CSV file.', 'error')
+            return redirect(request.url)
+
+        try:
+            # Read CSV file
+            csv_file = TextIOWrapper(file, encoding='utf-8')
+            reader = csv.DictReader(csv_file)
+
+            count = 0
+            for row in reader:
+                question_text = row.get('question')
+                option_a = row.get('option_a')
+                option_b = row.get('option_b')
+                option_c = row.get('option_c')
+                option_d = row.get('option_d')
+                answer = row.get('answer')
+
+                # Validate minimal data
+                if not (question_text and option_a and option_b and option_c and option_d and answer):
+                    continue  # skip incomplete rows
+
+                # Add question to DB
+                q = Question(
+                    exam=exam,
+                    section=section,
+                    topic=topic,
+                    question_text=question_text,
+                    option_a=option_a,
+                    option_b=option_b,
+                    option_c=option_c,
+                    option_d=option_d,
+                    answer=answer.upper()
+                )
+                db.session.add(q)
+                count += 1
+
+            db.session.commit()
+            flash(f'Successfully uploaded {count} questions!', 'success')
+            return redirect(url_for('admin_upload'))
+
+        except Exception as e:
+            flash(f'Error processing file: {str(e)}', 'error')
+            return redirect(request.url)
+
+    return render_template('admin_upload.html', exams=exams, sections=sections, topics=topics)
+
+@app.route("/exam", methods=["GET", "POST"])
+def exam():
+    questions = session.get("qs", [])  # already generated questions
+
+    if request.method == "POST":
+        # Loop through questions and store user's selected answers
+        for i, q in enumerate(questions):
+            q["user"] = request.form.get(f"q_{i}")  # Store selected option (A/B/C/D)
+
+        session["qs"] = questions  # Save updated with user's answers
+        return redirect(url_for("review"))
+
+    return render_template("exam.html", questions=questions)
+@app.route('/review_answers')
+def review_answers():
+    import json
+    results_json = session.get('results_data')
+
+    if not results_json:
+        return "No answers found. Please complete the exam first.", 400
+
+    # ✅ Convert string back to list of dicts
+    results_data = json.loads(results_json)
+
+    score = session.get('score', 0)
+    total = session.get('total', 0)
+    weak_areas = session.get('weak_areas', [])
+
+    return render_template("review.html",
+                           results=results_data,
+                           score=score, total=total,
+                           weak_areas=weak_areas)
+
 
 
 if __name__ == '__main__':

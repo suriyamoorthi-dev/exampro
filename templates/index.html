@@ -3,22 +3,45 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Testify</title>
+  <title>EXAMPRO</title>
+
+  <!-- ✅ SEO Meta Tags -->
+  <meta name="description" content="AI-powered exam simulator for NEET, GATE, and JEE with practice mode, mock tests, and AI assistant.">
+  <meta name="keywords" content=" NEET, GATE, JEE, exam simulator, mock test, AI exam, practice test">
+  <meta name="author" content="Exampro Team">
+
+  <!-- ✅ Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
-  
-  <!-- Google AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4605579560460422"
-     crossorigin="anonymous"></script>
+
+  <!-- ✅ Google AdSense (Auto Ads) -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4605579560460422" crossorigin="anonymous"></script>
 
   <style>
     * { box-sizing: border-box; }
     body {
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(to bottom right, #dbeafe, #c7d2fe);
-      min-height: 100vh;
-    }
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: radial-gradient(circle at top left, #e0f7fa, #f3e8ff, #e0f2fe);
+  background-attachment: fixed;
+  background-size: cover;
+  min-height: 100vh;
+  color: #1e293b;
+}
+
+.card {
+  background: #ffffff;
+  padding: 25px 20px;
+  border-radius: 16px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.08);
+}
+
+ 
 
     nav {
       background: #4f46e5;
@@ -113,7 +136,6 @@
       border-radius: 12px;
       border: 1px solid #cbd5e1;
       font-size: 15px;
-      transition: border-color 0.3s ease;
     }
 
     select:focus, input:focus {
@@ -129,16 +151,6 @@
       border: none;
       cursor: pointer;
       margin-top: 25px;
-      transition: background 0.3s ease, transform 0.2s ease;
-      user-select: none;
-    }
-
-    button:hover {
-      background: linear-gradient(to right, #4f46e5, #7c3aed);
-    }
-
-    button:active {
-      transform: scale(0.97);
     }
 
     .flash {
@@ -151,29 +163,10 @@
     }
 
     @media (max-width: 600px) {
-      .nav-toggle {
-        display: block;
-      }
-
-      .nav-links {
-        display: none;
-        flex-direction: column;
-        width: 100%;
-        margin-top: 10px;
-      }
-
-      .nav-links.show {
-        display: flex;
-      }
-
-      .nav-links a {
-        margin: 8px 0;
-        text-align: center;
-      }
-
-      h2 {
-        font-size: 1.4rem;
-      }
+      .nav-toggle { display: block; }
+      .nav-links { display: none; flex-direction: column; width: 100%; }
+      .nav-links.show { display: flex; }
+      .nav-links a { margin: 8px 0; text-align: center; }
     }
   </style>
 </head>
@@ -182,12 +175,14 @@
   <nav>
     <div class="nav-container">
       <div class="nav-logo">AI Exam</div>
-      <div class="nav-toggle" onclick="toggleMenu()" aria-label="Toggle navigation menu" role="button" tabindex="0">☰</div>
+      <div class="nav-toggle" onclick="toggleMenu()">☰</div>
       <div class="nav-links" id="navLinks">
-        <a href="javascript:void(0)" onclick="showSection('home')">Home</a>
-        <a href="javascript:void(0)" onclick="showSection('about')">About</a>
-        <a href="javascript:void(0)" onclick="showSection('terms')">Terms</a>
-        <a href="javascript:void(0)" onclick="showSection('help')">Help</a>
+        <a href="/privacy">Privacy</a>
+<a href="/terms">Terms</a>
+<a href="/contact">Contact</a>
+<a href="/about">About</a>
+
+
         <a href="/doubt">AI Assist</a>
       </div>
     </div>
@@ -195,8 +190,13 @@
 
   <!-- Home Section -->
   <div class="section active" id="home">
-    <div class="card" id="formCard">
+    <div class="card">
       <h2>Start Your Exam</h2>
+
+      <p style="text-align:center; font-size: 14px;">
+        Practice for GATE,NEET, and JEE exams. Let AI guide your preparation!
+      </p>
+
       <form method="POST" action="{{ url_for('generate_questions') }}" id="examForm">
         <label for="mode">Mode</label>
         <select name="mode" id="mode" required onchange="updateTopicVisibility()">
@@ -211,11 +211,11 @@
           {% endfor %}
         </select>
 
-        <label for="section">Sub Exam / Section</label>
+        <label for="section">Section</label>
         <select name="section" id="section" required onchange="updateTopics()"></select>
 
         <div id="topicDiv" style="display:none;">
-          <label for="topic">Sub Topic</label>
+          <label for="topic">Topic</label>
           <select name="topic" id="topic"></select>
         </div>
 
@@ -231,109 +231,41 @@
 
         <button type="submit" id="startExamBtn">Start Exam</button>
       </form>
+
+      <!-- ✅ Ad block after form -->
+      <div style="margin-top: 20px; text-align: center;">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-4605579560460422"
+             data-ad-slot="1234567890"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </div>
     </div>
   </div>
 
-  <!-- About Section -->
-  <div class="section" id="about">
-    <div class="card">
-      <h2>About This Platform</h2>
-      <p>
-        Welcome to the AI Exam Simulator – your smart learning partner for government exam preparation!<br><br>
-        Our platform is powered by advanced artificial intelligence to help you succeed in exams like,JEE.GATE,NEET We offer:<br><br>
-        ✅ AI-Generated Questions – Get unlimited practice with fresh, exam-style questions created instantly by AI.<br>
-        ✅ Mock Exams – Experience real exam patterns with full-length mock tests.<br>
-        ✅ Doubt Solver – Stuck on a question? Ask our AI assistant to explain it step-by-step in simple Tamil or English.<br>
-        ✅ Shortcut Tricks – Learn fast-solving techniques and memory hacks for tricky topics.<br><br>
-        Whether you're preparing for Group 4 or CGL, our AI makes your preparation smarter, faster, and more personalized.
-      </p>
-    </div>
-  </div>
-
-  <!-- Terms Section -->
-  <div class="section" id="terms">
-    <div class="card">
-      <h2>Terms and Conditions</h2>
-      <p>
-        1. Educational Purpose Only<br>
-        Our website is designed to help users prepare for government exams like, JEE, NEET, and GATE. All content, including AI-generated questions and explanations, is for learning and practice purposes only.<br><br>
-
-        2. No Guarantee of Accuracy<br>
-        While we strive to provide high-quality content, we do not guarantee the 100% accuracy or completeness of AI-generated questions, answers, or explanations. Always verify critical information from official sources.<br><br>
-
-        3. User Responsibility<br>
-        Users are responsible for how they use the platform. Misuse of the platform, including attempting to hack, spam, or extract content for unauthorized use, is strictly prohibited.<br><br>
-
-        4. Data Privacy<br>
-        We may collect basic usage data to improve the platform experience. We do not sell or share your personal data with third parties.<br><br>
-
-        5. Advertisements<br>
-        This website displays third-party ads, including Google Ads, to support the maintenance and development of the platform. These ads may use cookies to show personalized content. By using our site, you consent to such ads and cookies as per Google’s Privacy & Terms.<br><br>
-
-        6. Modifications<br>
-        We reserve the right to update or modify these terms at any time. Continued use of the site after changes means you agree to the updated terms.
-      </p>
-    </div>
-  </div>
-
-  <!-- Help Section -->
-  <div class="section" id="help">
-    <div class="card">
-      <h2>Help</h2>
-      <p>
-        💡 <strong>How to Use the Platform</strong><br><br>
-
-        <strong>1. Practice Mode</strong><br>
-        Select your exam, section, and topic.<br>
-        Get 10 AI-generated questions for focused practice.<br>
-        Check answers instantly and understand your weak areas.<br><br>
-
-        <strong>2. Mock Exam Mode</strong><br>
-        Select your exam and group.<br>
-        Take a full-length exam based on real exam pattern.<br>
-        Timer, navigation, and result analysis included.<br><br>
-
-        <strong>3. AI Doubt Solver</strong><br>
-        Stuck on a question?<br>
-        Go to the “AI Assistant” page.<br>
-        Choose “Doubt” mode, enter your question and topic — get clear explanations in Tamil or English.<br><br>
-
-        <strong>4. AI Trick Generator</strong><br>
-        Want shortcut tricks?<br>
-        Use the “Trick” mode to get memory hacks and short methods.<br><br>
-
-        📧 <strong>Need More Help?</strong><br>
-        If you face technical issues or want to give feedback, email us at:<br>
-        📩 <a href="mailto:edupulse@gmail.com">edupulse@gmail.com</a>
-      </p>
-    </div>
-  </div>
+  <!-- About, Terms, Help, Privacy Sections -->
+  <div class="section" id="about"><div class="card"><h2>About</h2><p>Smart AI platform for mock exams.</p></div></div>
+  <div class="section" id="terms"><div class="card"><h2>Terms</h2><p>Use for learning only. No guarantees on accuracy. Ads may be shown.</p></div></div>
+  <div class="section" id="help"><div class="card"><h2>Help</h2><p>Select exam > mode > section > topic → Click start.</p></div></div>
+  <div class="section" id="privacy"><div class="card"><h2>Privacy Policy</h2><p>We use Google Ads and analytics. We don’t share personal info.</p></div></div>
 
   <script>
-    // Navigation toggle
     function toggleMenu() {
       const links = document.getElementById('navLinks');
       links.classList.toggle('show');
     }
 
-    // Data from server - ensure these are passed as JSON in your Flask render_template
     const sections = {{ sections | tojson }};
     const subTopics = {{ sub_topics | safe }};
 
-    // Show/hide main sections
     function showSection(id) {
-      document.querySelectorAll('.section').forEach(sec => {
-        sec.classList.remove('active');
-      });
-      const target = document.getElementById(id);
-      if(target){
-        target.classList.add('active');
-      }
-      // Close mobile menu if open
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
       document.getElementById('navLinks').classList.remove('show');
     }
 
-    // Populate Sections dropdown based on selected exam
     function updateSections() {
       const exam = document.getElementById('exam').value;
       const sectionSelect = document.getElementById('section');
@@ -349,7 +281,6 @@
       updateTopics();
     }
 
-    // Populate Topics dropdown based on selected section & exam
     function updateTopics() {
       const exam = document.getElementById('exam').value;
       const section = document.getElementById('section').value;
@@ -368,29 +299,18 @@
       }
     }
 
-    // Show or hide topic selector based on mode
     function updateTopicVisibility() {
       const mode = document.getElementById('mode').value;
       const topicDiv = document.getElementById('topicDiv');
-      if (mode === 'practice') {
-        topicDiv.style.display = 'block';
-        document.getElementById('topic').required = true;
-      } else {
-        topicDiv.style.display = 'none';
-        document.getElementById('topic').required = false;
-      }
+      topicDiv.style.display = mode === 'practice' ? 'block' : 'none';
     }
 
-    // Animate form submission button and disable it to prevent multiple clicks
-    document.getElementById('examForm').addEventListener('submit', function(e){
+    document.getElementById('examForm').addEventListener('submit', function() {
       const btn = document.getElementById('startExamBtn');
       btn.disabled = true;
-      btn.textContent = 'Generating Questions...';
-      btn.style.background = 'linear-gradient(to right, #a78bfa, #c4b5fd)';
-      btn.style.cursor = 'wait';
+      btn.textContent = 'Generating...';
     });
 
-    // Initialize on load
     window.onload = () => {
       updateSections();
       updateTopicVisibility();

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contact Us | SmartExam</title>
+   <!-- ✅ Google AdSense Auto Ads -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4605579560460422"
+    crossorigin="anonymous"></script>
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f9fafb;
+      color: #1f2937;
+    }
+    h1 {
+      color: #4f46e5;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      font-family: 'Poppins', sans-serif;
+    }
+    button {
+      margin-top: 20px;
+      background-color: #6366f1;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button:hover {
+      background-color: #4f46e5;
+    }
+  </style>
+</head>
+<body>
+  <h1>Contact Us</h1>
+  <form method="POST" action="/contact_submit">
+    <label for="name">Name</label>
+    <input type="text" id="name" name="name" required />
+
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" required />
+
+    <label for="message">Message</label>
+    <textarea id="message" name="message" rows="5" required></textarea>
+
+    <button type="submit">Send Message</button>
+  </form>
+</body>
+</html>
